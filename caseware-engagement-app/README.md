@@ -1,34 +1,96 @@
-# CasewareEngagementApp
+# Caseware engagement updates · Angular client
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.3.
+Angular 20 client of the engagement update feature: the list of engagements with the template version
+they run on, plus the read only summary of the changes waiting for one engagement.
 
-## Development server
+The backend half lives in
+[`../caseware-engagement-transformation`](../caseware-engagement-transformation); the repository
+overview and the full domain documentation are in the [root README](../README.md).
 
-To start a local development server, run:
+## Requirements
 
-```bash
-ng serve
-```
+Node `^20.19.0 || ^22.12.0 || >=24.0.0` and npm (the Angular 20 engine requirement).
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Getting started
 
 ```bash
-ng generate component component-name
+npm install
+npm start          # ng serve on http://localhost:4200
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+The app is self contained while the backend is not wired in: it renders the whole feature from the
+fixtures under `src/app/shared/fixtures`, so no server has to be running.
 
-```bash
-ng generate --help
+## Scripts
+
+| Command | Does |
+| --- | --- |
+| `npm start` | `ng serve` on `http://localhost:4200` |
+| `npm run build` | production build into `dist/` |
+| `npm run watch` | development build in watch mode |
+| `npm test` | Karma in watch mode |
+| `npx ng test --watch=false --browsers=ChromeHeadless` | the suite once, without the watcher |
+
+There is no `e2e` target configured, so the feature is covered by the unit specs.
+
+## Structure
+
+```
+src/
+├── app/
+│   ├── core/
+│   │   ├── models/        engagement.model.ts: wire contract, labels and grouping helpers
+│   │   ├── services/      engagement-api.service.ts: the stubbed data access
+│   │   └── store/         engagement.store.ts: the signalStore of the screens
+│   ├── features/
+│   │   ├── engagement-list/      the list screen, the entry point of the feature
+│   │   └── update-summary-modal/ the read only summary of one engagement
+│   ├── shared/fixtures/   mock-engagements.ts: payloads copied from the service output
+│   ├── app.config.ts      zoneless change detection, router and HttpClient
+│   └── app.routes.ts      the list route
+├── styles.scss            global entry point
+└── styles/                Sass tokens and mixins
 ```
 
-## Styles
+## Screens
 
-The app is styled with [Sass](https://sass-lang.com/) (SCSS syntax, compiled by the Angular CLI):
+| Screen | Component | Content |
+| --- | --- | --- |
+| Engagement list (route `''`, `**` redirects here) | `EngagementListComponent` | Totals of the response plus one row per engagement: Engagement, Template, Version (`current -> latest`), Status and the `Review update` action |
+| Update summary | `UpdateSummaryModalComponent` | Opened from a row: the upgrade route, the applied diffs, the change counters and the changes grouped by template section |
+
+Rows of engagements that are already up to date keep the review action disabled, and `openSummary`
+ignores them outright. The modal closes on the `Close` button, the icon button, a click on the backdrop
+or `Escape`; it has no approve/deny action because applying an update is out of scope. Both screens are
+display only: there is no search, filter or sorting.
+
+## Data access
+
+`EngagementApiService` is the only place that will talk to the backend. It answers from the fixtures
+until the endpoints exist, and each method names the request that has to replace it:
+
+| Method | Endpoint it will call |
+| --- | --- |
+| `getEngagements()` | `GET {baseUrl}/engagements` |
+| `getPendingUpdateSummary(engagementId)` | `GET {baseUrl}/engagements/{engagementId}/pending-update-summary` |
+
+The simulated round trip is driven by the `API_LATENCY_MS` token: `250` ms in the app, `0` in the
+specs, so the tests stay synchronous.
+
+## State
+
+`EngagementStore` is a root `signalStore` and the single source of truth of both screens, so they
+always share the same instance.
+
+| Kind | Members |
+| --- | --- |
+| State | `engagements`, `totalCount`, `pendingUpdatesCount`, `selectedEngagementId`, `summary`, `listLoading`, `summaryLoading`, `listError`, `summaryError` |
+| Computed | `selectedEngagement`, `summaryChanges`, `isEmpty`, `isSummaryOpen`, `summaryGroups`, `summaryImpactCounts`, `actionRequiredCount` |
+| Methods | `loadEngagements()`, `openSummary(engagementId)`, `closeSummary()` |
+
+The components never touch the service: they call store methods and read the store signals, and the
+store is where every request is triggered and where the response is patched in. Reopening the modal of
+the engagement that is already loaded is served from the state, so the endpoint is not called twice.
 
 - `src/styles.scss` is the global entry point declared in the `styles` array of `angular.json`. It only holds global rules and exposes the design tokens as CSS custom properties.
 - `src/styles/_tokens.scss` keeps the variables (palette, spacing, font sizes, radii) and `src/styles/_mixins.scss` the shared mixins. Both are partials, so they never compile on their own.
