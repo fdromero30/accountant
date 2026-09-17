@@ -1,0 +1,41 @@
+// Design tokens of the app.
+//
+// Plain Sass variables: they are compile time only, so they never reach the browser. Every sheet
+// pulls them in with `@use 'tokens' as *;`, which resolves from anywhere because
+// `stylePreprocessorOptions.includePaths` of `angular.json` points at `src/styles`.
+
+// Palette.
+$color-ink: #0f172a;
+$color-surface: #ffffff;
+$color-border: #e2e8f0;
+$color-border-strong: #cbd5e1;
+$color-accent: #4338ca;
+$color-accent-soft: #eef2ff;
+$color-danger: #b91c1c;
+
+// Translucent tones of the ink color.
+$color-backdrop: rgba($color-ink, 0.55);
+$color-shadow: rgba($color-ink, 0.3);
+
+// Spacing scale, in rem.
+$space-1: 0.25rem;
+$space-2: 0.5rem;
+$space-3: 0.75rem;
+$space-4: 1rem;
+$space-5: 1.25rem;
+$space-6: 1.5rem;
+$space-7: 3rem;
+
+// Font sizes, in rem.
+$font-size-xs: 0.78rem;
+$font-size-sm: 0.85rem;
+$font-size-md: 0.9rem;
+$font-size-lg: 0.95rem;
+$font-size-xl: 1.15rem;
+$font-size-2xl: 1.5rem;
+
+// Borders and corners.
+$border-width: 1px;
+$radius-sm: 0.4rem;
+$radius-md: 0.5rem;
+$radius-pill: 999px;

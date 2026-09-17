@@ -1,0 +1,8 @@
+# Maven build output
+target/
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store

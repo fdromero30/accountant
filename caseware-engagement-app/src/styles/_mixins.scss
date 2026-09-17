@@ -1,0 +1,18 @@
+// Mixins shared by the sheets of the app.
+@use 'tokens' as *;
+
+// Items laid out in a row that wraps when the container is too narrow.
+@mixin row($gap: $space-3) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $gap;
+  align-items: center;
+}
+
+// Small rounded label used for statuses, impacts and change types.
+@mixin badge {
+  padding: 0.05rem $space-2;
+  border: $border-width solid $color-border-strong;
+  border-radius: $radius-pill;
+  font-size: $font-size-xs;
+}

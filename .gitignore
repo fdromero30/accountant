@@ -1,0 +1,17 @@
+# Build output
+caseware-engagement-transformation/target/
+
+# Node
+node_modules/
+dist/
+.angular/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json

@@ -1,0 +1,124 @@
+/**
+ * Update summary of one engagement: the upgrade route, how disruptive the changes are and the changes
+ * themselves grouped by template section.
+ *
+ * It only shows data: there is nothing to approve or deny and nothing to narrow down.
+ */
+<div class="modal-backdrop" data-testid="modal-backdrop" (click)="close()">
+  <div
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="update-summary-title"
+    (click)="$event.stopPropagation()"
+  >
+    @if (store.selectedEngagement(); as engagement) {
+      <header class="modal-header">
+        <div>
+          <h2 id="update-summary-title" data-testid="modal-title">{{ engagement.name }}</h2>
+          <p class="muted" data-testid="modal-subtitle">
+            {{ engagement.engagementId }} ·
+            {{ store.summary()?.templateDisplayName ?? engagement.templateDisplayName }}
+            ({{ engagement.templateId }})
+          </p>
+        </div>
+        <button
+          type="button"
+          class="modal-icon-button"
+          aria-label="Close update summary"
+          data-testid="modal-close"
+          (click)="close()"
+        >
+          &times;
+        </button>
+      </header>
+
+      <section class="modal-upgrade">
+        <p data-testid="modal-version">
+          Template version
+          <strong>{{ engagement.currentVersion }} &rarr; {{ engagement.latestVersion }}</strong>
+        </p>
+        @if (store.summary(); as summary) {
+          <p class="muted" data-testid="modal-accumulated">
+            Applied diffs:
+            @for (version of summary.accumulatedVersions; track version) {
+              <span class="chip">v{{ version }}</span>
+            }
+          </p>
+        }
+      </section>
+
+      @if (store.summaryError(); as error) {
+        <p class="error" role="alert" data-testid="modal-error">{{ error }}</p>
+      }
+
+      @if (store.summaryLoading()) {
+        <p data-testid="modal-loading">Loading pending changes...</p>
+      } @else if (store.summary(); as summary) {
+        <section class="modal-stats" data-testid="modal-stats">
+          <span data-testid="modal-total-changes">{{ summary.totalChangesCount }} changes</span>
+          <span data-testid="modal-action-required">{{ store.actionRequiredCount() }} require action</span>
+          @for (level of impactLevels; track level) {
+            @if (impactCount(level) > 0) {
+              <span class="badge" [attr.data-testid]="'impact-count-' + level">
+                {{ impactLabels[level] }}: {{ impactCount(level) }}
+              </span>
+            }
+          }
+        </section>
+
+        @if (store.summaryGroups().length === 0) {
+          <p data-testid="modal-empty">No pending changes for this engagement.</p>
+        } @else {
+          @for (group of store.summaryGroups(); track group.sectionDisplayName) {
+            <section class="modal-section" data-testid="modal-section">
+              <h3 data-testid="modal-section-name">{{ group.sectionDisplayName }}</h3>
+              <ul class="change-list">
+                @for (change of group.changes; track change.id) {
+                  <li
+                    class="change"
+                    data-testid="change-item"
+                    [attr.data-change-id]="change.id"
+                    [attr.data-impact]="change.impactLevel"
+                  >
+                    <div class="change-head">
+                      <span class="change-title" data-testid="change-title">{{ change.title }}</span>
+                      <span class="badge" data-testid="change-type">
+                        {{ changeTypeLabels[change.changeType] }}
+                      </span>
+                      <span class="badge" data-testid="change-impact">
+                        {{ impactLabels[change.impactLevel] }}
+                      </span>
+                      @if (change.actionRequired) {
+                        <span class="badge badge-action" data-testid="change-action-required">
+                          Action required
+                        </span>
+                      }
+                    </div>
+                    <p class="change-description" data-testid="change-description">
+                      {{ change.description }}
+                    </p>
+                    @if (change.oldValueSummary !== null || change.newValueSummary !== null) {
+                      <p class="change-values" data-testid="change-values">
+                        @if (change.oldValueSummary !== null) {
+                          <span data-testid="change-old-value">{{ change.oldValueSummary }}</span>
+                        }
+                        @if (change.newValueSummary !== null) {
+                          <span data-testid="change-new-value">{{ change.newValueSummary }}</span>
+                        }
+                      </p>
+                    }
+                  </li>
+                }
+              </ul>
+            </section>
+          }
+        }
+      }
+
+      <footer class="modal-footer">
+        <button type="button" data-testid="modal-cancel" (click)="close()">Close</button>
+      </footer>
+    }
+  </div>
+</div>

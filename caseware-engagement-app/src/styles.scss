@@ -1,0 +1,17 @@
+// Global stylesheet of the app: the Sass entry point declared in the `styles` array of
+// `angular.json`. Everything that has to be global lives here, the rest stays encapsulated in the
+// `*.component.scss` of each component.
+
+@use 'tokens' as *;
+
+// Tokens as CSS custom properties: the same values are then reachable from devtools or from a
+// non Angular part of the page, where a Sass variable cannot reach.
+:root {
+  --color-ink: #{$color-ink};
+  --color-surface: #{$color-surface};
+  --color-border: #{$color-border};
+  --color-accent: #{$color-accent};
+  --color-accent-soft: #{$color-accent-soft};
+  --color-danger: #{$color-danger};
+  --radius-md: #{$radius-md};
+}

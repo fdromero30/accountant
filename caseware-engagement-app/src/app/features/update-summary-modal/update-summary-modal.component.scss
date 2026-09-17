@@ -1,0 +1,120 @@
+// Styles of the read only update summary modal.
+//
+// Nesting is only used to keep the rules of a block together: the compiled selectors are the same
+// flat ones (`.modal-header h2`, `.chip, .badge`, ...) and the values come from the shared tokens.
+
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: $space-7 $space-4;
+  overflow-y: auto;
+  background: $color-backdrop;
+}
+
+.modal {
+  width: min(56rem, 100%);
+  padding: $space-5 $space-6 $space-4;
+  border-radius: $radius-md;
+  background: $color-surface;
+  box-shadow: 0 20px 45px $color-shadow;
+}
+
+.modal-header {
+  display: flex;
+  gap: $space-4;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: $space-3;
+  border-bottom: $border-width solid $color-border;
+
+  h2 {
+    margin: 0;
+    font-size: $font-size-xl;
+  }
+}
+
+.modal-icon-button {
+  border: 0;
+  background: transparent;
+  font-size: $font-size-2xl;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal-upgrade,
+.modal-stats,
+.modal-footer {
+  @include row($space-2);
+}
+
+.modal-upgrade,
+.modal-stats {
+  padding: $space-2 0;
+}
+
+.modal-stats {
+  font-size: $font-size-sm;
+}
+
+.modal-section h3 {
+  margin: $space-4 0 0.4rem;
+  font-size: $font-size-lg;
+}
+
+.change-list {
+  display: grid;
+  gap: $space-2;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.change {
+  padding: 0.6rem $space-3;
+  border: $border-width solid $color-border;
+  border-radius: $radius-sm;
+}
+
+.change-head {
+  @include row($space-2);
+}
+
+.change-title {
+  font-weight: 600;
+}
+
+.change-description,
+.change-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+  margin: 0.35rem 0 0;
+  font-size: $font-size-md;
+}
+
+.chip,
+.badge {
+  @include badge;
+}
+
+.chip {
+  background: $color-accent-soft;
+}
+
+.badge-action {
+  border-color: $color-danger;
+  color: $color-danger;
+}
+
+.modal-footer {
+  justify-content: flex-end;
+  margin-top: $space-5;
+  padding-top: $space-3;
+  border-top: $border-width solid $color-border;
+}

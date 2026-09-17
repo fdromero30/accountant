@@ -1,0 +1,76 @@
+<!--
+  Engagement list: the rows as they come from the backend, plus the entry point to the read only
+  update summary modal. No search, filter or sorting: the screen only shows data.
+-->
+<section class="engagement-list">
+  <div class="summary">
+    <span data-testid="total-count">{{ store.totalCount() }} engagements</span>
+    <span data-testid="pending-count">{{ store.pendingUpdatesCount() }} with pending updates</span>
+  </div>
+
+  @if (store.listError(); as error) {
+    <p class="error" role="alert" data-testid="error">{{ error }}</p>
+  }
+
+  @if (store.listLoading()) {
+    <p data-testid="loading">Loading engagements...</p>
+  } @else if (store.isEmpty()) {
+    <p data-testid="empty-state">No engagements available.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Engagement</th>
+          <th scope="col">Template</th>
+          <th scope="col">Version</th>
+          <th scope="col">Status</th>
+          <th scope="col">Pending changes</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (engagement of store.engagements(); track engagement.engagementId) {
+          <tr
+            data-testid="engagement-row"
+            [attr.data-engagement-id]="engagement.engagementId"
+            [attr.data-status]="engagement.status"
+            (click)="review(engagement)"
+          >
+            <td>
+              <strong>{{ engagement.name }}</strong>
+              <span class="muted">{{ engagement.engagementId }}</span>
+            </td>
+            <td>
+              {{ engagement.templateDisplayName }}
+              <span class="muted">{{ engagement.templateId }}</span>
+            </td>
+            <td>
+              {{ engagement.currentVersion }} &rarr; {{ engagement.latestVersion }}
+              @if (engagement.versionsBehind > 0) {
+                <span class="muted">{{ engagement.versionsBehind }} version(s) behind</span>
+              }
+            </td>
+            <td>
+              <span class="badge" [class.badge-pending]="canReview(engagement)">
+                {{ statusLabel(engagement) }}
+              </span>
+            </td>
+            <td>
+              <button
+                type="button"
+                data-testid="review-button"
+                [disabled]="!canReview(engagement)"
+                (click)="$event.stopPropagation(); review(engagement)"
+              >
+                Review update
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (store.isSummaryOpen()) {
+    <app-update-summary-modal />
+  }
+</section>
